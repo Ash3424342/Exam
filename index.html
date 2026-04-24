@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<!--
+  index.html
+  Purpose: Single-page app shell for the Online Examination Portal
+  All views are hidden <div> sections toggled via display:none/block in app.js
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExamPortal — Online Examination System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  VIEW: Login
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="view-login" class="view">
+  <div class="auth-wrapper">
+    <div class="card auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo__icon">📝</div>
+        <div>
+          <div class="auth-logo__text">ExamPortal</div>
+          <div class="auth-logo__sub">Online Examination System</div>
+        </div>
+      </div>
+      <h2 class="auth-card__title">Sign In</h2>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" name="username" autocomplete="username" placeholder="Enter username" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Enter password" />
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">Sign In</button>
+      </form>
+      <p class="auth-switch">
+        New student?
+        <a href="#" onclick="UIController.showView('register'); return false;">Create account</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  VIEW: Register (Students only)
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="view-register" class="view">
+  <div class="auth-wrapper">
+    <div class="card auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo__icon">📝</div>
+        <div>
+          <div class="auth-logo__text">ExamPortal</div>
+          <div class="auth-logo__sub">Student Registration</div>
+        </div>
+      </div>
+      <h2 class="auth-card__title">Create Account</h2>
+      <form id="register-form" novalidate>
+        <div class="form-group">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" name="username" autocomplete="username" placeholder="Choose a username" />
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" name="password" autocomplete="new-password" placeholder="Minimum 4 characters" />
+        </div>
+        <div class="form-group">
+          <label for="reg-confirm">Confirm Password</label>
+          <input type="password" id="reg-confirm" name="confirm" autocomplete="new-password" placeholder="Repeat password" />
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">Create Account</button>
+      </form>
+      <p class="auth-switch">
+        Already have an account?
+        <a href="#" onclick="UIController.showView('login'); return false;">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  VIEW: Admin Dashboard
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="view-admin-dashboard" class="view">
+  <div class="app-layout">
+
+    <!-- Top bar -->
+    <header class="app-topbar">
+      <div class="app-topbar__brand">📝 ExamPortal <span style="opacity:.5;font-weight:400;font-size:.8rem;margin-left:.5rem">Admin</span></div>
+      <div class="app-topbar__right">
+        <span class="app-topbar__user">👤 <span id="admin-username-display"></span></span>
+        <button class="btn btn--sm btn--secondary" data-action="logout">Logout</button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <div class="container">
+
+        <!-- Tabs navigation -->
+        <div class="tabs">
+          <nav class="tabs__nav">
+            <button class="tab-btn tab-btn--active" data-tab="questions">📚 Question Bank</button>
+            <button class="tab-btn" data-tab="exams">🗂 Exam Config</button>
+            <button class="tab-btn" data-tab="results">📊 Results</button>
+            <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
+          </nav>
+
+          <!-- ─ Tab: Question Bank ────────────────────────────────────────── -->
+          <div class="tab-pane" data-tab="questions">
+
+            <!-- Add / Edit Question form -->
+            <div class="card q-form-card">
+              <h3 id="q-form-title">Add Question</h3>
+              <form id="question-form" novalidate>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="q-subject">Subject</label>
+                    <input type="text" id="q-subject" placeholder="e.g. Mathematics" />
+                  </div>
+                  <div class="form-group">
+                    <label for="q-correct">Correct Answer</label>
+                    <select id="q-correct">
+                      <option value="">Select…</option>
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                      <option value="D">D</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="q-text">Question Text</label>
+                  <textarea id="q-text" rows="3" placeholder="Enter the question…"></textarea>
+                </div>
+                <div class="options-grid">
+                  <div class="form-group">
+                    <label for="q-opt-a">Option A</label>
+                    <input type="text" id="q-opt-a" placeholder="Option A" />
+                  </div>
+                  <div class="form-group">
+                    <label for="q-opt-b">Option B</label>
+                    <input type="text" id="q-opt-b" placeholder="Option B" />
+                  </div>
+                  <div class="form-group">
+                    <label for="q-opt-c">Option C</label>
+                    <input type="text" id="q-opt-c" placeholder="Option C" />
+                  </div>
+                  <div class="form-group">
+                    <label for="q-opt-d">Option D</label>
+                    <input type="text" id="q-opt-d" placeholder="Option D" />
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn--primary">Save Question</button>
+                  <button type="button" id="q-cancel-edit" class="btn btn--secondary" style="display:none">Cancel Edit</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Bulk Import -->
+            <div class="card bulk-import-section">
+              <h3>Bulk Import</h3>
+              <p class="text-muted" style="font-size:.85rem;margin-bottom:.75rem">
+                Paste a JSON array of <code>{ subject, questionText, options: [A,B,C,D], correctAnswer }</code> objects.
+              </p>
+              <div class="form-group">
+                <label for="bulk-import-textarea">JSON Input</label>
+                <textarea id="bulk-import-textarea" rows="5" placeholder='[{"subject":"Math","questionText":"...","options":["A","B","C","D"],"correctAnswer":"A"}]'></textarea>
+              </div>
+              <button id="bulk-import-btn" class="btn btn--secondary">Import Questions</button>
+            </div>
+
+            <!-- AI Generator -->
+            <div class="card ai-gen-section">
+              <h3>AI Question Generator</h3>
+              <p class="text-muted" style="font-size:.85rem;margin-bottom:1rem">
+                Uses Groq API to generate questions. Set your API key in Settings first.
+              </p>
+              <form id="ai-gen-form" novalidate>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="ai-topic">Topic</label>
+                    <input type="text" id="ai-topic" placeholder="e.g. World War II" />
+                  </div>
+                  <div class="form-group">
+                    <label for="ai-subject">Subject Label</label>
+                    <input type="text" id="ai-subject" placeholder="Same as topic if blank" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="ai-count">Number of Questions</label>
+                    <input type="number" id="ai-count" value="5" min="1" max="20" />
+                  </div>
+                  <div class="form-group">
+                    <label for="ai-model">Model</label>
+                    <select id="ai-model">
+                      <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                      <option value="meta-llama/llama-4-scout">meta-llama/llama-4-scout</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn--primary">✨ Generate Questions</button>
+              </form>
+            </div>
+
+            <!-- Question table -->
+            <div class="mt-3">
+              <div class="section-header">
+                <h3>Question Bank <span id="q-total-count" class="text-muted" style="font-weight:400;font-size:.85rem"></span></h3>
+                <div class="section-header__controls">
+                  <label for="q-subject-filter" class="sr-only">Filter by subject</label>
+                  <select id="q-subject-filter">
+                    <option value="__all__">All Subjects</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:150px">Subject</th>
+                      <th>Question</th>
+                      <th style="width:160px">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="q-table-body">
+                    <tr><td colspan="3" class="table-empty">No questions found.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="q-pagination" class="pagination"></div>
+            </div>
+
+          </div><!-- /tab questions -->
+
+          <!-- ─ Tab: Exam Config ─────────────────────────────────────────── -->
+          <div class="tab-pane" data-tab="exams" style="display:none">
+
+            <!-- Create / Edit Exam form -->
+            <div class="card" style="margin-bottom:1.5rem">
+              <h3 id="exam-form-title">Create Exam</h3>
+              <form id="exam-form" novalidate style="margin-top:1rem">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="exam-title">Exam Title</label>
+                    <input type="text" id="exam-title" placeholder="e.g. Mid-Term Mathematics" />
+                  </div>
+                  <div class="form-group">
+                    <label for="exam-subject">Subject</label>
+                    <select id="exam-subject">
+                      <option value="">Select subject…</option>
+                    </select>
+                    <div id="exam-available-count" class="available-count"></div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="exam-q-count">Question Count</label>
+                    <input type="number" id="exam-q-count" min="1" placeholder="e.g. 10" />
+                  </div>
+                  <div class="form-group">
+                    <label for="exam-time">Time Limit (minutes)</label>
+                    <input type="number" id="exam-time" min="1" placeholder="e.g. 30" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="exam-active" checked />
+                    Active (visible to students)
+                  </label>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn--primary">Save Exam</button>
+                  <button type="button" id="exam-cancel-edit" class="btn btn--secondary" style="display:none">Cancel Edit</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Exam list -->
+            <h3 style="margin-bottom:1rem">Exam List</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Questions</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th style="width:240px">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="exam-table-body">
+                  <tr><td colspan="6" class="table-empty">No exams configured.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div><!-- /tab exams -->
+
+          <!-- ─ Tab: Results Dashboard ──────────────────────────────────── -->
+          <div class="tab-pane" data-tab="results" style="display:none">
+
+            <div class="form-group" style="max-width:360px;margin-bottom:1.5rem">
+              <label for="results-exam-select">Select Exam</label>
+              <select id="results-exam-select">
+                <option value="">— Select an exam —</option>
+              </select>
+            </div>
+
+            <!-- Aggregate stats -->
+            <div id="results-stats" class="stats-grid" style="display:none">
+              <div class="stat-card">
+                <div class="stat-card__value" id="stats-count">—</div>
+                <div class="stat-card__label">Attempts</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__value" id="stats-avg">—</div>
+                <div class="stat-card__label">Average</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__value" id="stats-highest">—</div>
+                <div class="stat-card__label">Highest</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__value" id="stats-lowest">—</div>
+                <div class="stat-card__label">Lowest</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card__value" id="stats-passrate">—</div>
+                <div class="stat-card__label">Pass Rate</div>
+              </div>
+            </div>
+
+            <!-- Student results table -->
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Result</th>
+                    <th>Date Taken</th>
+                  </tr>
+                </thead>
+                <tbody id="results-table-body">
+                  <tr><td colspan="5" class="table-empty">Select an exam to view results.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div><!-- /tab results -->
+
+          <!-- ─ Tab: Settings ───────────────────────────────────────────── -->
+          <div class="tab-pane" data-tab="settings" style="display:none">
+
+            <div class="settings-section">
+              <h3>AI &amp; API Settings</h3>
+              <div class="form-group">
+                <label for="groq-api-key">Groq API Key <span class="text-muted" style="font-weight:400">(saved to session only)</span></label>
+                <input type="password" id="groq-api-key" placeholder="gsk_…" autocomplete="off" />
+              </div>
+              <div class="form-group">
+                <label for="settings-model">Default AI Model</label>
+                <select id="settings-model">
+                  <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                  <option value="meta-llama/llama-4-scout">meta-llama/llama-4-scout</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Exam Settings</h3>
+              <div class="form-group" style="max-width:200px">
+                <label for="passing-percent">Passing Threshold (%)</label>
+                <input type="number" id="passing-percent" min="1" max="100" value="50" />
+              </div>
+              <button id="settings-save-btn" class="btn btn--primary">Save Settings</button>
+            </div>
+
+            <div class="settings-section">
+              <h3>Storage</h3>
+              <div class="storage-bar-track">
+                <div class="storage-bar-fill" id="storage-bar-fill" style="width:0%"></div>
+              </div>
+              <div class="storage-bar-label" id="storage-bar-label">Calculating…</div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Danger Zone</h3>
+              <p class="text-muted" style="margin-bottom:1rem;font-size:.875rem">
+                Reset will permanently delete all questions, exams, results, and user accounts (except the default admin).
+              </p>
+              <button id="reset-data-btn" class="btn btn--danger">Reset Application Data</button>
+            </div>
+
+          </div><!-- /tab settings -->
+
+        </div><!-- /tabs -->
+      </div><!-- /container -->
+    </main>
+  </div>
+</div><!-- /view-admin-dashboard -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  VIEW: Student Dashboard
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="view-student-dashboard" class="view">
+  <div class="app-layout">
+
+    <header class="app-topbar">
+      <div class="app-topbar__brand">📝 ExamPortal</div>
+      <div class="app-topbar__right">
+        <span class="app-topbar__user">👤 <span id="student-username-display"></span></span>
+        <button class="btn btn--sm btn--secondary" data-action="logout">Logout</button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <div class="container">
+        <div class="student-welcome">
+          <h2>Welcome back, <span id="student-welcome-name"></span></h2>
+          <p>Select an exam below to get started.</p>
+        </div>
+        <div id="exam-cards-container" class="exam-cards-grid">
+          <p class="empty-state">No active exams available at this time.</p>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div><!-- /view-student-dashboard -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  VIEW: Exam (active exam engine)
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="view-exam" class="view">
+
+  <header class="exam-topbar">
+    <div>
+      <div class="exam-topbar__title" id="exam-title-display">Exam</div>
+      <div class="exam-topbar__meta" id="question-counter">Question 1 of N</div>
+    </div>
+    <div id="exam-timer" class="exam-timer">00:00</div>
+  </header>
+
+  <div class="exam-body">
+    <div class="card question-card">
+      <p class="question-counter" id="question-counter-body"></p>
+      <p class="question-text" id="question-text"></p>
+      <ul class="options-list" id="options-container"></ul>
+    </div>
+    <div class="exam-nav">
+      <button id="btn-prev" class="btn btn--secondary" disabled>← Previous</button>
+      <button id="btn-next" class="btn btn--primary">Next →</button>
+      <button id="btn-submit" class="btn btn--success" style="display:none">Submit Exam</button>
+    </div>
+  </div>
+
+</div><!-- /view-exam -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  VIEW: Result
+════════════════════════════════════════════════════════════════════════════ -->
+<div id="view-result" class="view">
+  <div class="app-layout">
+
+    <header class="app-topbar">
+      <div class="app-topbar__brand">📝 ExamPortal — Results</div>
+    </header>
+
+    <main class="app-content">
+      <div class="result-wrapper">
+
+        <div class="card result-scorecard">
+          <div class="result-score-big" id="result-score">—</div>
+          <div class="result-score-label">correct answers in <strong id="result-exam-title"></strong></div>
+          <div class="result-score-label" id="result-percent" style="font-size:1.4rem;font-weight:700;color:var(--color-primary)"></div>
+          <div id="result-badge" class="result-badge result-badge--pass">PASS</div>
+        </div>
+
+        <div class="result-review card">
+          <h3>Question Review</h3>
+          <div class="table-wrapper mt-2">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px">#</th>
+                  <th>Question</th>
+                  <th>Your Answer</th>
+                  <th>Correct Answer</th>
+                  <th style="width:60px">Result</th>
+                </tr>
+              </thead>
+              <tbody id="result-review-body"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:1.5rem">
+            <button id="result-back-btn" class="btn btn--primary">← Back to Dashboard</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+</div><!-- /view-result -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  MODALS
+════════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Timer Warning (2 minutes remaining) -->
+<div id="timer-warning-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="timer-warning-title">
+  <div class="modal__box">
+    <h2 class="modal__title" id="timer-warning-title">⏰ 2 Minutes Remaining</h2>
+    <p class="modal__body">You have 2 minutes left. Please review your answers and submit soon.</p>
+    <div class="modal__actions">
+      <button id="timer-warning-ok" class="btn btn--primary">OK, Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Confirmation -->
+<div id="submit-confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
+  <div class="modal__box">
+    <h2 class="modal__title" id="submit-confirm-title">Submit Exam?</h2>
+    <p class="modal__body">Are you sure you want to submit? You won't be able to change your answers after submission.</p>
+    <div class="modal__actions">
+      <button id="submit-confirm-cancel" class="btn btn--secondary">Go Back</button>
+      <button id="submit-confirm-yes" class="btn btn--success">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+  SCRIPTS — load in dependency order
+════════════════════════════════════════════════════════════════════════════ -->
+<script src="utils.js"></script>
+<script src="questionManager.js"></script>
+<script src="aiGenerator.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
