@@ -154,6 +154,9 @@ function escapeHtml(str) {
 
 /**
  * Returns storage usage info for localStorage.
+ * NOTE: The maxKB of 5120 (5 MB) reflects the common Safari/mobile default.
+ * Chrome and Firefox allow up to 10 MB. The bar is conservative — actual
+ * available space may be larger on desktop browsers.
  * @returns {{ usedKB: number, maxKB: number, percent: number }}
  */
 function getStorageUsage() {

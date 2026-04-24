@@ -938,7 +938,9 @@ const UIController = (() => {
 
   function _renderSettings() {
     const keyInput = document.getElementById('groq-api-key');
-    if (keyInput) keyInput.value = sessionStorage.getItem('groqApiKey') || '';
+    // Show placeholder dots if key is already set — avoid re-displaying the raw key value
+    if (keyInput) keyInput.value = sessionStorage.getItem('groqApiKey') ? '••••••••' : '';
+    if (keyInput) keyInput.placeholder = sessionStorage.getItem('groqApiKey') ? 'Key set (enter new key to change)' : 'gsk_…';
 
     const modelSel = document.getElementById('settings-model');
     if (modelSel) modelSel.value = sessionStorage.getItem('groqModel') || 'llama-3.3-70b-versatile';
@@ -952,13 +954,21 @@ const UIController = (() => {
     if (saveBtn && !saveBtn._initialized) {
       saveBtn._initialized = true;
       saveBtn.addEventListener('click', () => {
-        const key = document.getElementById('groq-api-key').value.trim();
+        const apiKeyInput = document.getElementById('groq-api-key');
         const model = document.getElementById('settings-model').value;
         const passing = parseInt(document.getElementById('passing-percent').value, 10);
 
-        // API key goes to sessionStorage only — never localStorage
-        if (key) sessionStorage.setItem('groqApiKey', key);
-        else sessionStorage.removeItem('groqApiKey');
+        // API key stored in sessionStorage ONLY (cleared on tab close) — never localStorage.
+        // This is intentional per spec: keeps the key ephemeral and out of persistent storage.
+        const trimmedKey = apiKeyInput.value.trim();
+        // If the user sees the placeholder dots and didn't change anything, keep existing key
+        if (trimmedKey && trimmedKey !== '••••••••') {
+          sessionStorage.setItem('groqApiKey', trimmedKey);
+        } else if (!trimmedKey) {
+          sessionStorage.removeItem('groqApiKey');
+        }
+        // Clear the input field after saving so key isn't visible in DOM
+        apiKeyInput.value = sessionStorage.getItem('groqApiKey') ? '••••••••' : '';
 
         sessionStorage.setItem('groqModel', model);
 
@@ -1026,10 +1036,18 @@ const UIController = (() => {
           <dt>Questions</dt><dd>${ex.questionCount}</dd>
           <dt>Duration</dt><dd>${ex.timeLimitMinutes} min</dd>
         </dl>
-        <button class="btn btn--primary" onclick="ExamEngine.start(${JSON.stringify(ex).replace(/"/g, '&quot;')})">
+        <button class="btn btn--primary" data-start-exam="${escapeHtml(ex.id)}">
           Start Exam
         </button>
       </div>`).join('');
+
+    // Attach event listeners using exam IDs — avoids inline serialisation/XSS risk
+    container.querySelectorAll('[data-start-exam]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const exam = ExamManager.getById(btn.dataset.startExam);
+        if (exam) ExamEngine.start(exam);
+      });
+    });
   }
 
   // ─── Result view ─────────────────────────────────────────────────────────────
